@@ -1,13 +1,12 @@
 import fire
 
-# Standard scientific Python imports
-import matplotlib.pyplot as plt
-
 # Import datasets, classifiers and performance metrics
 from sklearn import datasets, metrics
 from sklearn.neural_network import MLPClassifier
 
 # The digits dataset
+from input import MatrixInput
+
 digits = datasets.load_digits()
 n_samples = len(digits.images)
 
@@ -18,14 +17,6 @@ def run(learning_rate, n_training_samples=n_samples // 2):
         print('learning-rate must take values (0;1]\n'
               'n-training-samples must take int values [1;%i]' % (n_samples - 20))
         return
-
-    # The data is made of 8x8 images of digits
-    images_and_labels = list(zip(digits.images, digits.target))
-    for index, (image, label) in enumerate(images_and_labels[:20]):
-        plt.subplot(4, 10, index + 1)
-        plt.axis('off')
-        plt.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
-        plt.title('Training: %i' % label)
 
     # To apply a classifier on this data, we need to flatten the image, to
     # turn the data in a (samples, feature) matrix:
@@ -46,14 +37,11 @@ def run(learning_rate, n_training_samples=n_samples // 2):
           % (classifier, metrics.classification_report(expected, predicted)))
     print("Confusion matrix:\n%s" % metrics.confusion_matrix(expected, predicted))
 
-    images_and_predictions = list(zip(digits.images[n_training_samples:], predicted))
-    for index, (image, prediction) in enumerate(images_and_predictions[:20]):
-        plt.subplot(4, 10, index + 21)
-        plt.axis('off')
-        plt.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
-        plt.title('Prediction: %i\nTrue: %i' % (prediction, expected[index]))
+    def classify(matrix):
+        return classifier.predict(matrix)
 
-    plt.show()
+    matrix_input = MatrixInput()
+    matrix_input.show(classify)
 
 
 def main():
